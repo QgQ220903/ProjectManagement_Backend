@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -40,11 +41,13 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'project',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -82,7 +85,7 @@ DATABASES = {
         'NAME': 'workassignment',
         'USER': 'root',
         'PASSWORD': '',
-        'HOST': 'qgq',  # Use 'localhost' if the database is on the same machine
+        'HOST': '127.0.0.1',  # Use 'localhost' if the database is on the same machine
         'PORT': '3306',
     }
 }
