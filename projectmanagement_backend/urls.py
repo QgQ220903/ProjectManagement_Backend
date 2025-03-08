@@ -19,6 +19,14 @@ from django.urls import path
 from project import views
 
 urlpatterns = [
-   path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
-   path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
+  path('api/projects/', views.project_list),
+  path('api/projects/<int:pk>', views.project_detail),
+  path('api/projects/create', views.project_create),
+  path('api/projects/update/<int:pk>/', views.project_update),
+  path('api/projects/delete/<int:pk>/', views.project_delete),
+  path('api/project-parts/', views.project_part_list, name='project-part-list'),
+  path('api/project-parts/<int:pk>/', views.project_part_detail, name='project-part-detail'),
+  path('api/project-parts/create/', views.project_part_create, name='project-part-create'),
+  path('api/project-parts/update/<int:pk>/', views.project_part_update, name='project-part-update'),
+  path('api/project-parts/delete/<int:pk>/', views.project_part_delete, name='project-part-delete'),
 ]

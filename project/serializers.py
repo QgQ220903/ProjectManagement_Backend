@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Project  # Import model Project từ file models.py
+from .models import Project, ProjectPart # Import model Project từ file models.py
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,3 +13,20 @@ class ProjectSerializer(serializers.ModelSerializer):
         if not value.strip():  # Kiểm tra nếu chuỗi chỉ chứa khoảng trắng hoặc rỗng
             raise serializers.ValidationError("Tên dự án không được để trống.")
         return value
+    
+class ProjectPartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectPart
+        fields = '__all__'
+        read_only_fields = ['createdAt', 'updatedAt']
+
+    def validate_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Tên phần dự án không được để trống.")
+        return value
+    
+
+class ProjectPartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectPart
+        fields = '__all__'
