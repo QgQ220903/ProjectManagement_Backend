@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from project import views
+from project import views  # Import đúng cho ProjectListCreate, ProjectRetrieveUpdateDestroy
+from account.views import AccountListCreate  # Import đúng cho AccountListCreate
 
 urlpatterns = [
-   path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
-   path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
+    path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
+    path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
+    path('accounts/', AccountListCreate.as_view(), name='account-list-create'),
 ]
+
