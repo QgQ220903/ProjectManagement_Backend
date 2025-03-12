@@ -17,8 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from project import views
+from role import views as role_views
+from feature import views as feature_views
+from roleDetail import views as roleDetail_views
 
 urlpatterns = [
    path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
    path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
+   path('roles/', role_views.RoleListCreate.as_view(), name='role-list-create'),
+   path('roles/<int:pk>/', role_views.RoleRetrieveUpdateDestroy.as_view(), name='role-retrieve-update-destroy'),
+   path('features/', feature_views.FeatureListCreate.as_view(), name='feature-list-create'),
+   path('features/<int:pk>/', feature_views.FeatureRetrieveUpdateDestroy.as_view(), name='feature-retrieve-update-destroy'),
+   path('role-detail/', roleDetail_views.RoleDetailListCreate.as_view(), name='role-detail-list-create'),
+   path('role-detail/<int:pk>/', roleDetail_views.RoleDetailRetrieveUpdateDestroy.as_view(), name='role-detail-retrieve-update-destroy'),
+   path('role-detail/by-role/<int:roleId>/', roleDetail_views.RoleDetailByRoleIdList.as_view(), name='role-detail-by-role'),
 ]
