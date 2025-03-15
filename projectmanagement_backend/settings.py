@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'project',
+    'department',
+    'employee',
     'role',
     'feature',
     'roleDetail',
