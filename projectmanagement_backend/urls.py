@@ -34,7 +34,6 @@ urlpatterns = [
    path('login/', account_views.login_view, name='login'),
    path('logout/', account_views.logout_view, name='logout'),
    path('csrf/', account_views.get_csrf_token, name='csrf'),
-    ]
    path('api/', include('department.urls')),
    path('api/', include('employee.urls'))
 ]
