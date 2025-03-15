@@ -20,7 +20,7 @@ from project import views
 from role import views as role_views
 from feature import views as feature_views
 from roleDetail import views as roleDetail_views
-
+from account import views as account_views
 urlpatterns = [
    path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
    path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
@@ -31,4 +31,7 @@ urlpatterns = [
    path('role-detail/', roleDetail_views.RoleDetailListCreate.as_view(), name='role-detail-list-create'),
    path('role-detail/<int:pk>/', roleDetail_views.RoleDetailRetrieveUpdateDestroy.as_view(), name='role-detail-retrieve-update-destroy'),
    path('role-detail/by-role/<int:roleId>/', roleDetail_views.RoleDetailByRoleIdList.as_view(), name='role-detail-by-role'),
-]
+   path('login/', account_views.login_view, name='login'),
+   path('logout/', account_views.logout_view, name='logout'),
+   path('csrf/', account_views.get_csrf_token, name='csrf'),
+    ]
