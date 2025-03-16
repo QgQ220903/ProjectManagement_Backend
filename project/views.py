@@ -4,6 +4,8 @@ from rest_framework.pagination import PageNumberPagination # Import phân trang
 from .models import Project
 from .serializers import ProjectSerializer
 from rest_framework import filters
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 class ProjectPagination(PageNumberPagination):
     page_size = 10  # Số lượng item trên mỗi trang (có thể ghi đè giá trị trong settings)
@@ -16,3 +18,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter] # Thêm bộ lọc tìm kiếm và sắp xếp
     search_fields = ['name'] # Cho phép tìm kiếm theo tên
     ordering_fields = ['name', 'created_at', 'updated_at'] # Cho phép sắp xếp theo các trường này
+
+@api_view(['GET'])
+def project_list(request):
+    queryset = Project.objects.filter(is_deleted=False).order_by('-created_at')
+    serializer = ProjectSerializer(queryset, many=True)
+    return Response(serializer.data)

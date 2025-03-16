@@ -18,8 +18,8 @@ class Task(models.Model):
         ('POSTPONED', 'Trì hoãn'),
     ]
 
-    project_part = models.ForeignKey(ProjectPart, on_delete=models.CASCADE, related_name='tasks')
-    parent_task = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subtasks')
+    project_part = models.ForeignKey(ProjectPart, on_delete=models.CASCADE, related_name="tasks")
+    parent_task = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)  # Mặc định là Trung bình

@@ -1,30 +1,19 @@
 from rest_framework import serializers
 from project.models import Project
 from project_part.models import ProjectPart  
+from project_part.serializers import ProjectPartSerializer
 from task.models import Task  # Import model Task nếu nó nằm ở app khác
-
-# Serializer cho Task
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = [
-            'id', 'name', 'description', 'priority', 
-            'start_time', 'end_time', 'task_status', 
-            'completion_percentage', 'created_at', 'updated_at'
-        ]
-
-# Serializer cho ProjectPart, bao gồm danh sách Task
-class ProjectPartSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)  # Thêm danh sách Task
-
-    class Meta:
-        model = ProjectPart
-        fields = ['id', 'name', 'is_deleted', 'created_at', 'updated_at', 'tasks']
 
 # Serializer cho Project, bao gồm danh sách ProjectPart
 class ProjectSerializer(serializers.ModelSerializer):
-    parts = ProjectPartSerializer(source='projectpart_set', many=True, read_only=True)
+    project_parts = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'created_at', 'updated_at', 'parts']
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+    def get_project_parts(self, obj):
+        project_parts = obj.project_parts.filter(is_deleted=False).order_by('-created_at') # Sử dụng related_name đã khai báo
+        serializer = ProjectPartSerializer(project_parts, many=True)
+        return serializer.data

@@ -1,11 +1,8 @@
 # project_parts/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProjectPartViewSet
-
-router = DefaultRouter()
-router.register(r'project_parts', ProjectPartViewSet)
+from . import views
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', views.projectpart_list),
 ]
