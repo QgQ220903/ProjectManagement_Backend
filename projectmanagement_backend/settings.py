@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 # settings.py
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10  # Số lượng item trên mỗi trang
+    'PAGE_SIZE': 5  # Số lượng item trên mỗi trang
 }
 
 MIDDLEWARE = [
