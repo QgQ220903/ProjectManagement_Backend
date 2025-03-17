@@ -9,3 +9,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'positionName', 'employeeName', 'employeePhone', 'employeeEmail', 'status', 'departmentID']
+    def validate_employeeName(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Tên nhân viên không được để trống.")
+        return value
+
+    def validate_employeeEmail(self, value):
+        if "@" not in value:
+            raise serializers.ValidationError("Email không hợp lệ.")
+        return value

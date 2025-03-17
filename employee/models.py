@@ -15,3 +15,5 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.employeeName
+    class Meta:
+            db_table = "employee"

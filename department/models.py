@@ -7,3 +7,5 @@ class Department(models.Model):
 
     def __str__(self):
         return self.departmentName
+    class Meta:
+        db_table = "department"

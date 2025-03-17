@@ -31,9 +31,7 @@ urlpatterns = [
    path('role-detail/', roleDetail_views.RoleDetailListCreate.as_view(), name='role-detail-list-create'),
    path('role-detail/<int:pk>/', roleDetail_views.RoleDetailRetrieveUpdateDestroy.as_view(), name='role-detail-retrieve-update-destroy'),
    path('role-detail/by-role/<int:roleId>/', roleDetail_views.RoleDetailByRoleIdList.as_view(), name='role-detail-by-role'),
-   path('login/', account_views.login_view, name='login'),
-   path('logout/', account_views.logout_view, name='logout'),
-   path('csrf/', account_views.get_csrf_token, name='csrf'),
+   path('api/', include('account.urls')),
    path('api/', include('department.urls')),
    path('api/', include('employee.urls'))
 ]
