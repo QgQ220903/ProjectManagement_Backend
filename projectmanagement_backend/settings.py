@@ -47,8 +47,16 @@ INSTALLED_APPS = [
     'feature',
     'roleDetail',
     'account',
+    'project_part',
+    'task',
     'corsheaders',
 ]
+
+# settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5  # Số lượng item trên mỗi trang
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
