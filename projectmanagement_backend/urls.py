@@ -22,8 +22,9 @@ from feature import views as feature_views
 from roleDetail import views as roleDetail_views
 from account import views as account_views
 urlpatterns = [
-   path('projects/', views.ProjectListCreate.as_view(), name='project-list-create'),
-   path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroy.as_view(), name='project-retrieve-update-destroy'),
+   path('api/projects/', include('project.urls')), # Thêm URL của app projects
+   path('api/project-parts/', include('project_part.urls')), # Thêm URL của app project_parts
+   path('api/tasks/', include('task.urls')),
    path('roles/', role_views.RoleListCreate.as_view(), name='role-list-create'),
    path('roles/<int:pk>/', role_views.RoleRetrieveUpdateDestroy.as_view(), name='role-retrieve-update-destroy'),
    path('features/', feature_views.FeatureListCreate.as_view(), name='feature-list-create'),
