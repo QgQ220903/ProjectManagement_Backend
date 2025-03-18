@@ -1,10 +1,10 @@
 from django.db import models
-from department.models import Department  # Import model Department
 
 class Employee(models.Model):
     department = models.ForeignKey(
-        Department, 
+        'department.Department', 
         on_delete=models.CASCADE, 
+        related_name='department_employees',
         verbose_name="Mã phòng ban"
     )
     positionName = models.CharField(max_length=255, verbose_name="Tên chức vụ")

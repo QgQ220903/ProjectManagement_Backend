@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Employee, Department
+from .models import Employee
+from department.models import Department
 
 class EmployeeSerializer(serializers.ModelSerializer):
     departmentID = serializers.PrimaryKeyRelatedField(
