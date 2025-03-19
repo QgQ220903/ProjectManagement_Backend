@@ -22,4 +22,7 @@ from django.urls import include, path
 urlpatterns = [
     path('api/projects/', include('project.urls')), # Thêm URL của app projects
     path('api/project-parts/', include('project_part.urls')), # Thêm URL của app project_parts
-    path('api/tasks/', include('task.urls')),]
+    path('api/tasks/', include('task.urls')),
+    path('api/departments/', include('department.urls')),
+    path('api/employees/', include('employee.urls')),
+]

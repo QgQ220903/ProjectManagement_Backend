@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'project',
     'project_part',
     'task',
+    'department',
+    'employee',
     'corsheaders',
 ]
 
