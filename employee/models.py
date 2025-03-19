@@ -16,3 +16,8 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+      db_table = 'employees'
+      verbose_name = "Nhân Viên"
+      verbose_name_plural = "Các nhân viên"

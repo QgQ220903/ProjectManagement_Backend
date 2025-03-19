@@ -10,3 +10,8 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+      db_table = 'departments'
+      verbose_name = "Phòng Ban"
+      verbose_name_plural = "Các phòng ban"
