@@ -26,4 +26,5 @@ urlpatterns = [
     path('api/departments/', include('department.urls')),
     path('api/employees/', include('employee.urls')),
     path('api/task-assignments/', include('task_assignment.urls')),  # Include các URL của ứng dụng task_assignment]
+    path('api/department-tasks/', include('task_department.urls')),
 ]

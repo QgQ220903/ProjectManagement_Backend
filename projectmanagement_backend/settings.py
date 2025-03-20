@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'department',
     'employee',
     'task_assignment',
+    'task_department',
     'corsheaders',
 ]
 
