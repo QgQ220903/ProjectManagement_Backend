@@ -28,3 +28,12 @@ class DepartmentTaskCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DepartmentTask
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        # Lấy thông tin manager của department
+        manager = instance.department.manager if instance.department else None
+        representation['id_employee'] = manager.id if manager else None
+        
+        return representation
