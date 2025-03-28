@@ -21,10 +21,12 @@ class AccountSerializer(serializers.ModelSerializer):
             role=role,  # Bổ sung role vào đây để tránh lỗi NULL
             employee= employee
         )
-
-
         return user
-
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])  # Dùng set_password()
+            validated_data.pop('password')
+        return super().update(instance, validated_data)
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
