@@ -2,9 +2,11 @@
 from rest_framework import serializers
 from .models import ProjectPart
 from task.task_detail_serializers import TaskDetailSerializer
+from department.models import Department
 
 class ProjectPartSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
+    department = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), required=False)  # Chỉnh sửa để trường department không bắt buộc
 
     class Meta:
         model = ProjectPart

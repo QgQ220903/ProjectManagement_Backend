@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'employee',
     'task_assignment',
     'task_department',
+    'work_history',
     'corsheaders',
 ]
 
@@ -96,7 +97,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'workassignment',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',  # Use 'localhost' if the database is on the same machine
         'PORT': '3306',
     }

@@ -3,6 +3,8 @@ from rest_framework.response import Response  # Import lớp Response để tr�
 from .models import Department  # Import model Department từ models.py của ứng dụng hiện tại
 from .serializers import DepartmentSerializer, DepartmentCreateUpdateSerializer  # Import các serializer cho model Department
 
+from rest_framework.permissions import IsAuthenticated
+
 class DepartmentListCreate(generics.ListCreateAPIView):
     """
     View để xử lý danh sách phòng ban (GET) và tạo phòng ban mới (POST).

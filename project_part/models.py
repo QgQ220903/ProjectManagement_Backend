@@ -1,12 +1,14 @@
+# project_part/models.py
 from django.db import models
-from project.models import Project
-# Create your models here.
+from department.models import Department
+
 class ProjectPart(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name="Dự án", related_name="project_parts")
-    name = models.CharField(max_length=255, verbose_name="Tên phần dự án")
-    is_deleted = models.BooleanField(default=False, verbose_name="Đã xóa")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='project_parts')
+    name = models.CharField(max_length=255)
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="project_parts")
 
     def __str__(self):
         return self.name
