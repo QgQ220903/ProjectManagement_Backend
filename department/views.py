@@ -2,14 +2,18 @@ from rest_framework import generics, status  # Import các lớp generics và m�
 from rest_framework.response import Response  # Import lớp Response để trả về dữ liệu API
 from .models import Department  # Import model Department từ models.py của ứng dụng hiện tại
 from .serializers import DepartmentSerializer, DepartmentCreateUpdateSerializer  # Import các serializer cho model Department
-
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
+
+class DepartmentPagination(PageNumberPagination):
+    page_size = 5  # Số lượng phần tử trên mỗi trang
 class DepartmentListCreate(generics.ListCreateAPIView):
     """
     View để xử lý danh sách phòng ban (GET) và tạo phòng ban mới (POST).
     """
-    queryset = Department.objects.filter(is_deleted=False)  # Chỉ lấy các Department có is_deleted là False
+    queryset = Department.objects.filter(is_deleted=False).order_by('id')  # Chỉ lấy các Department có is_deleted là False
+    pagination_class = DepartmentPagination
     def get_serializer_class(self):
         """
         Xác định serializer được sử dụng dựa trên phương thức request.

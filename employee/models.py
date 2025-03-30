@@ -4,6 +4,8 @@ class Employee(models.Model):
     POSITION_CHOICES = (
         ('TP', 'Trưởng phòng'),
         ('NV', 'Nhân viên'),
+        ('TN', 'Trưởng nhóm'),
+        ('PP', 'Phó phòng'),
     )
     department = models.ForeignKey('department.Department', on_delete=models.CASCADE, related_name='employees')
     position = models.CharField(max_length=2, choices=POSITION_CHOICES)
