@@ -28,7 +28,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+# test
+CORS_ALLOW_CREDENTIALS = True  # Cho phép gửi credentials (cookies, token)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Chỉ định frontend React/Vue
+]
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+]  # Các header được phép
 
 # Application definition
 
@@ -158,8 +168,8 @@ REST_FRAMEWORK = {
     ]
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Access token hết hạn sau 15 phút
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token hết hạn sau 7 ngày
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=10),  # Access token hết hạn sau 15 phút
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=1),  # Refresh token hết hạn sau 7 ngày
     "ROTATE_REFRESH_TOKENS": True,  # Cấp refresh token mới khi làm mới access token
     "BLACKLIST_AFTER_ROTATION": True,  # Blacklist refresh token cũ sau khi làm mới
     "AUTH_HEADER_TYPES": ("Bearer",),
