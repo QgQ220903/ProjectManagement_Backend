@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +28,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+# test
+CORS_ALLOW_CREDENTIALS = True  # Cho phép gửi credentials (cookies, token)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Chỉ định frontend React/Vue
+]
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+]  # Các header được phép
 
 # Application definition
 
@@ -40,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'project',
     'project_part',
     'task',
@@ -48,6 +61,10 @@ INSTALLED_APPS = [
     'task_assignment',
     'task_department',
     'work_history',
+    'role',
+    'feature',
+    'account',
+    'role_detail',
     'corsheaders',
 ]
 
@@ -144,3 +161,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'account.Account'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=10),  # Access token hết hạn sau 15 phút
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=1),  # Refresh token hết hạn sau 7 ngày
+    "ROTATE_REFRESH_TOKENS": True,  # Cấp refresh token mới khi làm mới access token
+    "BLACKLIST_AFTER_ROTATION": True,  # Blacklist refresh token cũ sau khi làm mới
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

@@ -17,7 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('api/projects/', include('project.urls')), # Thêm URL của app projects
@@ -27,5 +30,11 @@ urlpatterns = [
     path('api/employees/', include('employee.urls')),
     path('api/task-assignments/', include('task_assignment.urls')),  # Include các URL của ứng dụng task_assignment]
     path('api/department-tasks/', include('task_department.urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/account/', include('account.urls')),
+    path('api/roles/', include('role.urls')),
+    path('api/features/', include('feature.urls')),
+    path('api/role-details/', include('role_detail.urls')),
     path('api/work-histories/', include('work_history.urls')),
 ]
