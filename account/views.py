@@ -6,11 +6,13 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Account
 from .serializers import AccountSerializer,LoginSerializer,LogoutSerializer
+
 from rest_framework.pagination import PageNumberPagination
 
 class AccountPagination(PageNumberPagination):
     page_size = 5
 class AccountViewSet(viewsets.ModelViewSet):
+    
     queryset = Account.objects.all().order_by('id')
     serializer_class = AccountSerializer
     pagination_class = AccountPagination

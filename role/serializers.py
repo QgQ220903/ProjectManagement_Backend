@@ -8,3 +8,10 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
+class RoleCreateUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer dùng để tạo và cập nhật Role, không yêu cầu role_details.
+    """
+    class Meta:
+        model = Role
+        fields = '__all__' 

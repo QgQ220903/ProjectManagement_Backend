@@ -4,11 +4,16 @@ from rest_framework import serializers
 from employee.serializers import EmployeeSerializer
 from .models import Account,Role
 from employee.models import Employee
+from role.serializers import RoleSerializer
+from employee.serializers import EmployeeSerializer
 class AccountSerializer(serializers.ModelSerializer):
-
+    role = RoleSerializer(read_only=True)  # Hiển thị thông tin chi tiết role
+    employee = EmployeeSerializer(read_only=True)  # Hiển thị thông tin chi tiết employee
+    role_id = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), source='role', write_only=True)
+    employee_id = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), source='employee', write_only=True, allow_null=True)
     class Meta:
         model = Account
-        fields = ['id', 'email', 'password', 'role',  'employee']
+        fields = ['id', 'email', 'password', 'role','role_id',  'employee','employee_id']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -27,6 +32,16 @@ class AccountSerializer(serializers.ModelSerializer):
             instance.set_password(validated_data['password'])  # Dùng set_password()
             validated_data.pop('password')
         return super().update(instance, validated_data)
+    def to_representation(self, instance):
+        """
+        Ghi đè to_representation để hiển thị đầy đủ thông tin role và employee khi GET hoặc POST.
+        """
+        data = super().to_representation(instance)
+        if instance.role:
+            data['role'] = RoleSerializer(instance.role).data  # Hiển thị chi tiết role
+        if instance.employee:
+            data['employee'] = EmployeeSerializer(instance.employee).data  # Hiển thị chi tiết employee
+        return data
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)

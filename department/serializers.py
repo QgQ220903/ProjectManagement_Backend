@@ -38,11 +38,17 @@ class DepartmentCreateUpdateSerializer(serializers.ModelSerializer):
     """
     Serializer để tạo hoặc cập nhật Department, sử dụng PrimaryKeyRelatedField cho manager.
     """
-    manager = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), allow_null=True)  # Sử dụng PrimaryKeyRelatedField để cho phép chọn manager bằng ID. allow_null=True để cho phép manager là null.
+    manager = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), allow_null=True)
 
     class Meta:
+        model = Department
+        fields = '__all__'
+
+    def to_representation(self, instance):
         """
-        Định nghĩa metadata cho DepartmentCreateUpdateSerializer.
+        Ghi đè phương thức to_representation để hiển thị thông tin chi tiết của manager.
         """
-        model = Department  # Liên kết serializer với model Department
-        fields = '__all__'  # Sử dụng tất cả các trường của model Department
+        data = super().to_representation(instance)
+        if instance.manager:  # Nếu có manager, thay thế ID bằng thông tin chi tiết
+            data['manager'] = EmployeeSerializer(instance.manager).data
+        return data
