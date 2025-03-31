@@ -1,48 +1,46 @@
-from rest_framework import generics, status  # Import các lớp generics và mã trạng thái HTTP
+from rest_framework import viewsets, status  # Import các lớp generics và mã trạng thái HTTP
 from rest_framework.response import Response  # Import lớp Response để trả về dữ liệu API
 from .models import Department  # Import model Department từ models.py của ứng dụng hiện tại
 from .serializers import DepartmentSerializer, DepartmentCreateUpdateSerializer  # Import các serializer cho model Department
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+
 
 
 class DepartmentPagination(PageNumberPagination):
     page_size = 5  # Số lượng phần tử trên mỗi trang
-class DepartmentListCreate(generics.ListCreateAPIView):
-    """
-    View để xử lý danh sách phòng ban (GET) và tạo phòng ban mới (POST).
-    """
-    queryset = Department.objects.filter(is_deleted=False).order_by('id')  # Chỉ lấy các Department có is_deleted là False
-    pagination_class = DepartmentPagination
-    def get_serializer_class(self):
-        """
-        Xác định serializer được sử dụng dựa trên phương thức request.
-        Sử dụng DepartmentCreateUpdateSerializer cho POST (tạo mới) và DepartmentSerializer cho GET (lấy danh sách).
-        """
-        if self.request.method == 'POST':
-            return DepartmentCreateUpdateSerializer
-        return DepartmentSerializer
 
-class DepartmentRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+class DepartmentViewSet(viewsets.ModelViewSet):
     """
-    View để xử lý chi tiết phòng ban (GET), cập nhật phòng ban (PUT, PATCH) và xóa phòng ban (DELETE).
+    ViewSet để xử lý CRUD phòng ban.
     """
-    queryset = Department.objects.filter(is_deleted=False)  # Chỉ lấy các Department có is_deleted là False
+    queryset = Department.objects.filter(is_deleted=False).order_by('id')
+    pagination_class = DepartmentPagination  
+
     def get_serializer_class(self):
         """
         Xác định serializer được sử dụng dựa trên phương thức request.
-        Sử dụng DepartmentCreateUpdateSerializer cho PUT/PATCH (cập nhật) và DepartmentSerializer cho GET (lấy chi tiết).
         """
-        if self.request.method in ['PUT', 'PATCH']:
+        if self.action in ['create', 'update', 'partial_update']:
             return DepartmentCreateUpdateSerializer
         return DepartmentSerializer
 
     def destroy(self, request, *args, **kwargs):
         """
         Xử lý yêu cầu xóa phòng ban (DELETE).
-        Thay vì xóa phòng ban khỏi database, cập nhật trường is_deleted thành True.
+        Thay vì xóa khỏi database, cập nhật trường is_deleted thành True.
         """
-        instance = self.get_object()  # Lấy đối tượng Department cần xóa
-        instance.is_deleted = True  # Đặt is_deleted thành True
-        instance.save()  # Lưu lại đối tượng với is_deleted đã cập nhật
-        return Response(status=status.HTTP_204_NO_CONTENT)  # Trả về response 204 No Content (xóa thành công)
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'])
+    def get_all_departments(self, request):
+        """
+        API lấy tất cả phòng ban (không phân trang).
+        """
+        departments = Department.objects.filter(is_deleted=False)
+        serializer = DepartmentSerializer(departments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

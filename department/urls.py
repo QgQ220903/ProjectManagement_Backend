@@ -1,7 +1,10 @@
-from django.urls import path
-from .views import DepartmentListCreate, DepartmentRetrieveUpdateDestroy
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import DepartmentViewSet
+
+router = DefaultRouter()
+router.register(r'', DepartmentViewSet)
 
 urlpatterns = [
-    path('', DepartmentListCreate.as_view()),
-    path('<int:pk>/', DepartmentRetrieveUpdateDestroy.as_view()),
+    path('', include(router.urls)),  # Tự động tạo các route cho ViewSet
 ]

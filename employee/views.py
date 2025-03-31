@@ -1,22 +1,28 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import generics
+from rest_framework import status,viewsets
+from rest_framework.response import Response
 from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.pagination import PageNumberPagination
 from account.permissions import DynamicPermission
-
+from rest_framework.decorators import action
 class EmployeePagination(PageNumberPagination):
     page_size = 5  # Số lượng phần tử trên mỗi trang
 
-class EmployeeListCreate(generics.ListCreateAPIView):
+class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all().order_by('id')
     serializer_class = EmployeeSerializer
     pagination_class = EmployeePagination  # Thêm dòng này
     # permission_classes = [DynamicPermission]  # Áp dụng kiểm tra quyền
     # feature_name = "Quản lý nhân viên"
-
-class EmployeeRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
+    @action(detail=False, methods=['get'])
+    def get_all_employees(self, request):
+        """Lấy tất cả nhân viên mà không phân trang"""
+        employees = Employee.objects.all()
+        serializer = self.get_serializer(employees, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+# class EmployeeRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Employee.objects.all()
+#     serializer_class = EmployeeSerializer
