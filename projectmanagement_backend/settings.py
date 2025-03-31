@@ -169,7 +169,7 @@ REST_FRAMEWORK = {
     ]
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=10),  # Access token hết hạn sau 15 phút
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # Access token hết hạn sau 15 phút
     "REFRESH_TOKEN_LIFETIME": timedelta(hours=1),  # Refresh token hết hạn sau 7 ngày
     "ROTATE_REFRESH_TOKENS": True,  # Cấp refresh token mới khi làm mới access token
     "BLACKLIST_AFTER_ROTATION": True,  # Blacklist refresh token cũ sau khi làm mới
