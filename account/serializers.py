@@ -47,3 +47,19 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(required=True, write_only=True)
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+
+class UpdateSerializer(serializers.Serializer):
+    password = serializers.CharField(required=False, write_only=True)
+    role_id = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), source='role', write_only=True, required=False)
+
+    def update(self, instance, validated_data):
+        # Cập nhật mật khẩu nếu có
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+
+        # Cập nhật role nếu có
+        if 'role' in validated_data:
+            instance.role = validated_data['role']
+
+        instance.save()
+        return instance

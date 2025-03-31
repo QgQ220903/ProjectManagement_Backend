@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Account
-from .serializers import AccountSerializer,LoginSerializer,LogoutSerializer
+from .serializers import AccountSerializer,LoginSerializer,LogoutSerializer,UpdateSerializer
 
 from rest_framework.pagination import PageNumberPagination
 
@@ -64,7 +64,16 @@ class AccountViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
+    @action(detail=True, methods=['put'], permission_classes=[AllowAny],serializer_class=UpdateSerializer)
+    def update_account(self, request, pk=None):
+        """Cập nhật password hoặc role"""
+        account = self.get_object()
+        serializer = UpdateSerializer(account, data=request.data, partial=True)
 
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Cập nhật thành công", "user": AccountSerializer(account).data})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def me(self, request):
         """API Lấy thông tin user hiện tại"""
