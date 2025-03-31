@@ -2,6 +2,8 @@
 from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
 from .models import ProjectPart
+from department.models import Department
+from rest_framework import serializers
 from .serializers import ProjectPartSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
