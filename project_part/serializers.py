@@ -9,6 +9,8 @@ class ProjectPartSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
     department = DepartmentSerializer(read_only=True)  # Hiển thị chi tiết department khi GET
     department_id = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), write_only=True)
+    manager_id = serializers.SerializerMethodField()  # Thêm trường manager_id
+
     class Meta:
         model = ProjectPart
         fields = '__all__'
@@ -18,6 +20,13 @@ class ProjectPartSerializer(serializers.ModelSerializer):
         tasks = obj.tasks.filter(is_deleted=False, parent_task__isnull=True).order_by('-created_at')
         serializer = TaskDetailSerializer(tasks, many=True)
         return serializer.data
+
+    def get_manager_id(self, obj):
+        """Lấy ID của manager từ department"""
+        if obj.department and obj.department.manager:
+            return obj.department.manager.id
+        return None
+
     def create(self, validated_data):
         department = validated_data.pop('department_id', None)  # Lấy ID của department từ dữ liệu gửi lên
         project_part = ProjectPart.objects.create(**validated_data, department=department)  # Tạo bản ghi với department đúng kiểu
