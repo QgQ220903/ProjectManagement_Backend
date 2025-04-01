@@ -1,4 +1,3 @@
-# project/serializers.py
 from rest_framework import serializers
 from .models import Project
 from project_part.serializers import ProjectPartSerializer
@@ -8,5 +7,9 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'is_deleted', 
+            'created_at', 'updated_at', 
+            'project_parts'  # Đảm bảo có tất cả các field cần thiết
+        ]
         read_only_fields = ['created_at', 'updated_at']

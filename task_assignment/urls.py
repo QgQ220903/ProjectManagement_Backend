@@ -1,8 +1,11 @@
 # task_assignment/urls.py
-from django.urls import path
-from .views import TaskAssignmentListCreate, TaskAssignmentRetrieveUpdateDestroy
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from task_assignment.views import TaskAssignmentViewSet  # Import từ app riêng
+
+router = DefaultRouter()
+router.register(r'', TaskAssignmentViewSet, basename='task-assignment')
 
 urlpatterns = [
-    path('', TaskAssignmentListCreate.as_view()),
-    path('<int:pk>/', TaskAssignmentRetrieveUpdateDestroy.as_view()),
+    path('', include(router.urls)),
 ]

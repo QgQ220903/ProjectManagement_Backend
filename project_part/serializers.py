@@ -1,4 +1,3 @@
-# project_part/serializers.py
 from rest_framework import serializers
 from .models import ProjectPart
 from department.serializers import DepartmentSerializer
@@ -7,27 +6,35 @@ from department.models import Department
 
 class ProjectPartSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
-    department = DepartmentSerializer(read_only=True)  # Hiển thị chi tiết department khi GET
-    department_id = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), write_only=True)
-    manager_id = serializers.SerializerMethodField()  # Thêm trường manager_id
+    department = DepartmentSerializer(read_only=True)
+    department_id = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), 
+        write_only=True,
+        source='department'  # Thêm source để tự động map khi create/update
+    )
+    manager_id = serializers.SerializerMethodField()
 
     class Meta:
         model = ProjectPart
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'project', 
+            'department', 'department_id', 'manager_id', 
+            'is_deleted', 'created_at', 'updated_at',
+            'tasks'  # Đảm bảo bao gồm tất cả các trường cần thiết
+        ]
         read_only_fields = ['created_at', 'updated_at']
 
     def get_tasks(self, obj):
-        tasks = obj.tasks.filter(is_deleted=False, parent_task__isnull=True).order_by('-created_at')
-        serializer = TaskDetailSerializer(tasks, many=True)
-        return serializer.data
+        tasks = obj.tasks.filter(
+            is_deleted=False, 
+            parent_task__isnull=True
+        ).order_by('-created_at').prefetch_related(
+            'task_assignments__employee',
+            'subtasks'
+        )
+        return TaskDetailSerializer(tasks, many=True).data
 
     def get_manager_id(self, obj):
-        """Lấy ID của manager từ department"""
-        if obj.department and obj.department.manager:
-            return obj.department.manager.id
-        return None
+        return obj.department.manager.id if obj.department and obj.department.manager else None
 
-    def create(self, validated_data):
-        department = validated_data.pop('department_id', None)  # Lấy ID của department từ dữ liệu gửi lên
-        project_part = ProjectPart.objects.create(**validated_data, department=department)  # Tạo bản ghi với department đúng kiểu
-        return project_part
+    # Có thể bỏ phương thức create() vì đã dùng source='department'
