@@ -26,7 +26,7 @@ class Task(models.Model):
     priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    task_status = models.CharField(max_length=50, choices=TASK_STATUS_CHOICES, default='TO_DO')
+    task_status = models.CharField(max_length=50, choices=TASK_STATUS_CHOICES, default='IN_PROGRESS')
     completion_percentage = models.IntegerField(default=0)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
@@ -59,8 +59,8 @@ class Task(models.Model):
                 new_percentage = 0
             else:
                 # Hoặc tính theo assignments nếu có
-                completed = self.task_assignments.filter(status='DONE').count()
-                total = self.task_assignments.count()
+                completed = self.task_assignments.filter(role='DOER', status='DONE').count()
+                total = self.task_assignments.filter(role='DOER').count()
                 new_percentage = (completed / total) * 100 if total > 0 else self.completion_percentage
         
         # Làm tròn và đảm bảo trong khoảng 0-100
