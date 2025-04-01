@@ -12,25 +12,17 @@ class DepartmentPagination(PageNumberPagination):
     page_size = 5  # Số lượng phần tử trên mỗi trang
 
 class DepartmentViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet để xử lý CRUD phòng ban.
-    """
     queryset = Department.objects.filter(is_deleted=False).order_by('id')
     pagination_class = DepartmentPagination  
 
     def get_serializer_class(self):
-        """
-        Xác định serializer được sử dụng dựa trên phương thức request.
-        """
+
         if self.action in ['create', 'update', 'partial_update']:
             return DepartmentCreateUpdateSerializer
         return DepartmentSerializer
 
     def destroy(self, request, *args, **kwargs):
-        """
-        Xử lý yêu cầu xóa phòng ban (DELETE).
-        Thay vì xóa khỏi database, cập nhật trường is_deleted thành True.
-        """
+
         instance = self.get_object()
         instance.is_deleted = True
         instance.save()
@@ -38,9 +30,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def get_all_departments(self, request):
-        """
-        API lấy tất cả phòng ban (không phân trang).
-        """
+
         departments = Department.objects.filter(is_deleted=False)
         serializer = DepartmentSerializer(departments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

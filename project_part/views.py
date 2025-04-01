@@ -1,6 +1,6 @@
 # project_part/views.py
 from rest_framework.decorators import action
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters,status
 from rest_framework.pagination import PageNumberPagination
 from .models import ProjectPart
 from department.models import Department
@@ -88,3 +88,16 @@ class ProjectPartViewSet(viewsets.ModelViewSet):
         else:
             # Nếu không có phòng ban, chỉ update các trường còn lại mà không thay đổi phòng ban
             serializer.save()
+    
+    @action(detail=False, methods=['get'], url_path='by_department/(?P<department_id>\d+)')
+    def by_department(self, request, department_id=None):
+        """
+        Lấy danh sách các phần dự án theo ID phòng ban.
+        """
+        project_parts = self.queryset.filter(department_id=department_id)
+        # page = self.paginate_queryset(project_parts)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(project_parts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
