@@ -4,6 +4,7 @@ from task_assignment.models import TaskAssignment
 from .models import Task
 from .serializers import TaskSerializer  # Thêm dòng này
 from .task_detail_serializers import TaskDetailSerializer
+from .employee_leaf_task_serializers import EmployeeLeafTaskSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 class TaskAssignmentViewSet(viewsets.ModelViewSet):
@@ -27,26 +28,22 @@ class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử l
 
     @action(detail=False, methods=['GET'], url_path='employee-leaf-tasks/(?P<employee_id>[^/.]+)')
     def get_employee_leaf_tasks(self, request, employee_id=None):
-        """
-        Lấy tất cả công việc con thấp nhất (không có subtask) của một nhân viên
-        """
         try:
-            # Lấy tất cả task assignment của nhân viên
             assignments = TaskAssignment.objects.filter(
                 employee_id=employee_id,
-                is_deleted=False
+                is_deleted=False,
+                role='DOER'
             ).select_related('task')
             
             leaf_tasks = []
             
             for assignment in assignments:
                 task = assignment.task
-                # Kiểm tra nếu task không có subtask (là leaf task)
                 if not task.subtasks.exists():
                     leaf_tasks.append(task)
             
-            # Serialize dữ liệu
-            serializer = TaskDetailSerializer(leaf_tasks, many=True, context={'request': request})
+            # Sử dụng serializer mới không bao gồm task_assignments
+            serializer = EmployeeLeafTaskSerializer(leaf_tasks, many=True, context={'request': request})
             
             return response.Response({
                 'success': True,
