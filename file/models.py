@@ -13,4 +13,4 @@ class File(models.Model):
     class Meta:
       db_table = 'files'
       verbose_name = "Tài liệu"
-      verbose_name_plural = "Các tìa liệu"
+      verbose_name_plural = "Các tài liệu"

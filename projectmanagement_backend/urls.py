@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/work-histories/', include('work_history.urls')),
     path('api/files/', include('file.urls')),
     path('api/file-details/', include('file_detail.urls')),
+    path('', include('message.urls')),
 ]
 
 if settings.DEBUG:
