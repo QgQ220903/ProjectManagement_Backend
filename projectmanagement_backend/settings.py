@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -65,7 +65,13 @@ INSTALLED_APPS = [
     'feature',
     'account',
     'role_detail',
+    'file',
+    'file_detail',
+    'message',
+    'chatroom',
     'corsheaders',
+    'channels',
+
 ]
 
 # settings.py
@@ -104,7 +110,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'projectmanagement_backend.wsgi.application'
-
+ASGI_APPLICATION = 'projectmanagement_backend.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -175,3 +181,18 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,  # Blacklist refresh token cũ sau khi làm mới
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        # Nếu dùng Redis thì thay bằng:
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {
+        #     "hosts": [("127.0.0.1", 6379)],
+        # },
+    },
+}
+
+MEDIA_URL = '/media/'  # URL để truy cập file
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+CORS_ALLOW_ALL_ORIGINS = True
