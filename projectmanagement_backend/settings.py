@@ -38,6 +38,7 @@ CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
     "x-csrftoken",
+    "x-requested-with"
 ]  # Các header được phép
 
 # Application definition
@@ -120,7 +121,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'workassignment',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',  # Use 'localhost' if the database is on the same machine
         'PORT': '3306',
     }
