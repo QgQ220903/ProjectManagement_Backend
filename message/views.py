@@ -13,6 +13,7 @@ def get_chat_history(request, room_name):
         [{
             "sender": msg.sender.email,
             "chat": msg.content,
+            "name": msg.sender.name,
             "timestamp": msg.timestamp,
             "file": {
                 "name": msg.file.name,

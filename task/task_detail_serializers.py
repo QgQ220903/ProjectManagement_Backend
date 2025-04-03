@@ -69,6 +69,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
             doers_data.append({
                 **employee_data,
                 'status': assignment.status,
+                'id_assignment': assignment.id,
                 'files': files
             })
         

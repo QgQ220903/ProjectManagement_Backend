@@ -55,6 +55,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "type": "chat_message",
                 "message": chat,
                 "sender": sender.email,
+                "name": sender.name,
                 "file": {
                     "name": file.name,
                     "url": file.link.url
@@ -69,11 +70,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event["message"]
         sender_email = event["sender"]  # Lấy email thay vì object
+        sender_name = event["name"]
         file=event["file"]
 
         print(f"chat_message :  file: {file}") 
         # Gửi tin nhắn qua WebSocket
-        await self.send(text_data=json.dumps({"message": message, "sender": sender_email, "file": file}))
+        await self.send(text_data=json.dumps({"message": message, "sender": sender_email, "name": sender_name,"file": file}))
 
 
     @sync_to_async
