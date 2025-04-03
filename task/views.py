@@ -35,29 +35,26 @@ class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử l
                 is_deleted=False,
                 role='DOER'
             ).select_related('task')
-            
+
             leaf_tasks = []
-            
+
             for assignment in assignments:
                 task = assignment.task
                 if not task.subtasks.exists():
+                    # Gán thêm assignment_id vào task
+                    task.assignment_id = assignment.id  # Lưu assignment_id vào object
                     leaf_tasks.append(task)
-            
-            # Sử dụng serializer mới không bao gồm task_assignments
-            serializer = EmployeeLeafTaskSerializer(leaf_tasks, many=True, context={'request': request})
-            
-            # Thêm phân trang
-            paginator = PageNumberPagination()
-            paginator.page_size = request.query_params.get('page_size', 10)  # Có thể custom page_size qua URL
-            result_page = paginator.paginate_queryset(leaf_tasks, request)
-            
-            serializer = EmployeeLeafTaskSerializer(result_page, many=True, context={'request': request})
-            
-            return paginator.get_paginated_response({
+
+            serializer = EmployeeLeafTaskSerializer(
+                leaf_tasks, many=True, context={'request': request, 'employee_id': employee_id}
+            )
+
+            return response.Response({
                 'success': True,
+                'count': len(leaf_tasks),
                 'data': serializer.data
             })
-            
+
         except Exception as e:
             return response.Response({
                 'success': False,
