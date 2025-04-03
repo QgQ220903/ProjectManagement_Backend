@@ -31,5 +31,25 @@ class TaskDetailSerializer(serializers.ModelSerializer):
         return EmployeeSerializer(assignment.employee).data if assignment else None
 
     def get_doers(self, obj):
-        doers = obj.task_assignments.filter(role='DOER')
-        return EmployeeSerializer([a.employee for a in doers], many=True).data
+        doers_assignments = obj.task_assignments.filter(role='DOER').select_related('employee').prefetch_related('task_assignment_file')
+        doers_data = []
+        
+        for assignment in doers_assignments:
+            employee_data = EmployeeSerializer(assignment.employee).data
+            # Lấy tất cả file của doer trong task này
+            file_details = assignment.task_assignment_file.all()
+            
+            doers_data.append({
+                **employee_data,
+                'status': assignment.status,
+                'files': [
+                    {
+                        'link': self.context['request'].build_absolute_uri(fd.file.link.url),
+                        'name': fd.file.name,
+                        'status': fd.status
+                    } 
+                    for fd in file_details
+                ] if file_details else []
+            })
+        
+        return doers_data

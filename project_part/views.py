@@ -101,3 +101,9 @@ class ProjectPartViewSet(viewsets.ModelViewSet):
         #     return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(project_parts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
