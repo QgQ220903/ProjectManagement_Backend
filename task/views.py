@@ -65,3 +65,8 @@ class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử l
         if self.action in ['retrieve', 'list']:
             return TaskDetailSerializer
         return TaskSerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context

@@ -75,6 +75,7 @@ INSTALLED_APPS = [
 
 ]
 
+
 # settings.py
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -121,7 +122,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'workassignment',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',  # Use 'localhost' if the database is on the same machine
         'PORT': '3306',
     }
@@ -194,6 +195,7 @@ CHANNEL_LAYERS = {
     },
 }
 
+SITE_URL = 'http://127.0.0.1:8000'  # Hoặc domain thực tế của bạn
 MEDIA_URL = '/media/'  # URL để truy cập file
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
