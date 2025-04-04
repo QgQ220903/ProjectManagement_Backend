@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'chatroom',
     'corsheaders',
     'channels',
+    'background_task',
 
 ]
 
@@ -199,3 +200,10 @@ SITE_URL = 'http://127.0.0.1:8000'  # Hoặc domain thực tế của bạn
 MEDIA_URL = '/media/'  # URL để truy cập file
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # hoặc smtp của dịch vụ khác như Outlook, Mailtrap,...
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cuuphan00@gmail.com'
+EMAIL_HOST_PASSWORD = 'nxlalmmqfvnggqrl'

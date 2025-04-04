@@ -8,8 +8,20 @@ from .serializers import EmployeeSerializer
 from rest_framework.pagination import PageNumberPagination
 from account.permissions import DynamicPermission
 from rest_framework.decorators import action
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def send_employee_update(data):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "employee_updates",
+        {
+            "type": "send_update",
+            "message": data
+        }
+    )
 class EmployeePagination(PageNumberPagination):
-    page_size = 5  # Số lượng phần tử trên mỗi trang
+    page_size = 10  # Số lượng phần tử trên mỗi trang
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all().order_by('id')
@@ -17,6 +29,19 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     pagination_class = EmployeePagination  # Thêm dòng này
     # permission_classes = [DynamicPermission]  # Áp dụng kiểm tra quyền
     # feature_name = "Quản lý nhân viên"
+
+    def perform_create(self, serializer):
+        employee = serializer.save()
+        send_employee_update({"action": "create", "employee": EmployeeSerializer(employee).data})
+
+    def perform_update(self, serializer):
+        employee = serializer.save()
+        send_employee_update({"action": "update", "employee": EmployeeSerializer(employee).data})
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        send_employee_update({"action": "delete", "employee_id": instance.id})
+        
     @action(detail=False, methods=['get'])
     def get_all_employees(self, request):
         """Lấy tất cả nhân viên mà không phân trang"""
