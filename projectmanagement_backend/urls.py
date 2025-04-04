@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/files/', include('file.urls')),
     path('api/file-details/', include('file_detail.urls')),
     path('', include('message.urls')),
+    path('api/email/', include('send_email.urls')),
 ]
 
 if settings.DEBUG:
