@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'chatroom',
     'corsheaders',
     'channels',
+    'background_task',
 
 ]
 
