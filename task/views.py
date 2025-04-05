@@ -8,6 +8,21 @@ from .employee_leaf_task_serializers import EmployeeLeafTaskSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination  # Thêm import
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def send_task_update(data):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "task_updates",
+        {
+            "type": "send_task_update",
+            "message": data
+        }
+    )
+
+
 class TaskAssignmentViewSet(viewsets.ModelViewSet):
     queryset = TaskAssignment.objects.all()  # Sửa từ Task.objects... sang TaskAssignment.objects...
     serializer_class = TaskAssignmentSerializer
@@ -21,11 +36,18 @@ class TaskAssignmentViewSet(viewsets.ModelViewSet):
         # Nếu trạng thái mới là 'DONE', cập nhật phần trăm task cha
         if instance.status == 'DONE':
             instance.task.update_completion_percentage()
-
+        send_task_update({
+        "action": "update",
+        "task_id": instance.task.id,
+        "assignment_id": instance.id,
+        "status": instance.status,
+        })
         return response.Response(serializer.data)
 
 class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử lý Task
     queryset = Task.objects.filter(is_deleted=False).order_by('-created_at')
+
+
 
     @action(detail=False, methods=['GET'], url_path='employee-leaf-tasks/(?P<employee_id>[^/.]+)')
     def get_employee_leaf_tasks(self, request, employee_id=None):
@@ -66,6 +88,28 @@ class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử l
             return TaskDetailSerializer
         return TaskSerializer
     
+
+    def perform_create(self, serializer):
+        task = serializer.save()
+        send_task_update({
+            "action": "create",
+            "task": TaskSerializer(task).data
+        })
+
+    def perform_update(self, serializer):
+        task = serializer.save()
+        send_task_update({
+            "action": "update",
+            "task": TaskSerializer(task).data
+        })
+
+    def perform_destroy(self, instance):
+        task_id = instance.id
+        instance.delete()
+        send_task_update({
+            "action": "delete",
+            "task_id": task_id
+        })
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request

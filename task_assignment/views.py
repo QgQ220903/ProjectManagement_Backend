@@ -4,38 +4,37 @@ from .models import TaskAssignment
 from .serializers import TaskAssignmentSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def send_task_assignment_update(action, data):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "task_assignments",
+        {
+            "type": "task_assignment_update",
+            "action": action,
+            "data": data
+        }
+    )
 class TaskAssignmentViewSet(viewsets.ModelViewSet):
     queryset = TaskAssignment.objects.all()
     serializer_class = TaskAssignmentSerializer
 
 
-    def notify_ws_clients(self, action, instance):
-        """
-        Gửi thông báo WebSocket khi có thay đổi trong TaskAssignment.
-        """
-        channel_layer = get_channel_layer()
-        serializer = self.get_serializer(instance)
-        async_to_sync(channel_layer.group_send)(
-            "task_assignments",  # Đảm bảo group là 'task_assignments'
-            {
-                "type": "task_assignment_update",
-                "action": action,
-                "data": serializer.data,
-            }
-        )
-
     def perform_create(self, serializer):
         instance = serializer.save()
-        self.notify_ws_clients("create", instance)
+        send_task_assignment_update("create", self.get_serializer(instance).data)
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        self.notify_ws_clients("update", instance)
+        send_task_assignment_update("update", self.get_serializer(instance).data)
 
     def perform_destroy(self, instance):
         instance.is_deleted = True
         instance.save()
-        self.notify_ws_clients("delete", instance)
+        send_task_assignment_update("delete", self.get_serializer(instance).data)
 
 
 
@@ -49,5 +48,5 @@ class TaskAssignmentViewSet(viewsets.ModelViewSet):
         
         if old_status != instance.status:
             instance.task.update_completion()  # Đảm bảo gọi đúng tên phương thức
-        
+        send_task_assignment_update("update", self.get_serializer(instance).data)
         return Response(serializer.data)  # Sửa thành Response (đã import)
