@@ -24,8 +24,9 @@ import project.routing
 import project_part.routing
 import task_assignment.routing
 import task.routing
+import file_detail.routing
 # Gộp tất cả WebSocket routes
-websocket_urlpatterns = employee.routing.websocket_urlpatterns + message.routing.websocket_urlpatterns+ department.routing.websocket_urlpatterns + project.routing.websocket_urlpatterns + project_part.routing.websocket_urlpatterns +task_assignment.routing.websocket_urlpatterns+task.routing.websocket_urlpatterns
+websocket_urlpatterns = employee.routing.websocket_urlpatterns + message.routing.websocket_urlpatterns+ department.routing.websocket_urlpatterns + project.routing.websocket_urlpatterns + project_part.routing.websocket_urlpatterns +task_assignment.routing.websocket_urlpatterns+task.routing.websocket_urlpatterns + file_detail.routing.websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
