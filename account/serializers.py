@@ -13,7 +13,7 @@ class AccountSerializer(serializers.ModelSerializer):
     employee_id = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), source='employee', write_only=True, allow_null=True)
     class Meta:
         model = Account
-        fields = ['id', 'email', 'password', 'role','role_id',  'employee','employee_id']
+        fields = ['id', 'email','is_deleted', 'password', 'role','role_id',  'employee','employee_id']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
