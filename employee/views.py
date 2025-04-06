@@ -21,10 +21,12 @@ def send_employee_update(data):
         }
     )
 class EmployeePagination(PageNumberPagination):
-    page_size = 10  # Số lượng phần tử trên mỗi trang
+    page_size = 5 # Số lượng item mỗi trang
+    page_size_query_param = 'page_size'  # Cho phép client tuỳ chỉnh số lượng item/trang
+    max_page_size = 100  # Giới hạn tối đa item/tran
 
 class EmployeeViewSet(viewsets.ModelViewSet):
-    queryset = Employee.objects.all().order_by('id')
+    queryset = Employee.objects.all().filter(is_deleted=False).order_by('id')
     serializer_class = EmployeeSerializer
     pagination_class = EmployeePagination  # Thêm dòng này
     # permission_classes = [DynamicPermission]  # Áp dụng kiểm tra quyền
@@ -45,9 +47,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def get_all_employees(self, request):
         """Lấy tất cả nhân viên mà không phân trang"""
-        employees = Employee.objects.all()
+        employees = Employee.objects.all().filter(is_deleted=False).order_by('id')
         serializer = self.get_serializer(employees, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({
+            "count": employees.count(),
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['get'], url_path='get_by_department/(?P<department_id>[^/.]+)')
     def get_by_department(self, request, department_id=None):

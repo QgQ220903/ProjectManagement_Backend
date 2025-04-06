@@ -52,4 +52,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 
         departments = Department.objects.filter(is_deleted=False)
         serializer = DepartmentSerializer(departments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({
+            "count": departments.count(),
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
