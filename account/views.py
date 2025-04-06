@@ -50,7 +50,8 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         if not user:
             return Response({"error": "Sai email hoặc mật khẩu"}, status=status.HTTP_400_BAD_REQUEST)
-
+        if getattr(user, 'is_deleted', False):
+            return Response({"error": "Tài khoản không tồn tại hoặc đã bị xóa"}, status=status.HTTP_400_BAD_REQUEST)
         refresh = RefreshToken.for_user(user)
         return Response({
             "refresh": str(refresh),
