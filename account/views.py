@@ -16,6 +16,15 @@ class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all().order_by('id')
     serializer_class = AccountSerializer
     pagination_class = AccountPagination
+
+    @action(detail=False, methods=['get'])
+    def get_all_acount(self, request):
+        accounts = self.get_queryset()
+        serializer = self.get_serializer(accounts, many=True)
+        return Response({
+            'count': accounts.count(),
+            'results': serializer.data
+        })
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
         """API Đăng ký người dùng với quyền"""
