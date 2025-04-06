@@ -83,6 +83,36 @@ class ProjectPartViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    @action(detail=False, methods=['get'], url_path='archived/(?P<department_id>\d+)')
+    def get_archived_parts_by_department(self, request, department_id=None):
+        """
+        Lấy danh sách các phần dự án đã archive (is_deleted=True) theo department_id
+        URL: /api/project-parts/archived/<department_id>/
+        """
+        try:
+            # Kiểm tra department có tồn tại không
+            department = Department.objects.get(id=department_id)
+        except Department.DoesNotExist:
+            return Response(
+                {"error": "Department không tồn tại"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        archived_parts = ProjectPart.objects.filter(
+            is_deleted=True,
+            department_id=department_id
+        ).order_by('-created_at')
+        
+        # Phân trang
+        page = self.paginate_queryset(archived_parts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(archived_parts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
