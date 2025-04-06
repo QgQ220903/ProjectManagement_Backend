@@ -6,6 +6,7 @@ from department.models import Department
 
 class ProjectPartSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
+    archived_tasks = serializers.SerializerMethodField()  # Thêm trường mới
     department = DepartmentSerializer(read_only=True)
     department_id = serializers.PrimaryKeyRelatedField(
         queryset=Department.objects.all(), 
@@ -20,7 +21,7 @@ class ProjectPartSerializer(serializers.ModelSerializer):
             'id', 'name', 'project', 
             'department', 'department_id', 'manager_id', 
             'is_deleted', 'created_at', 'updated_at',
-            'tasks'  # Đảm bảo bao gồm tất cả các trường cần thiết
+            'tasks', 'archived_tasks'  # Đảm bảo bao gồm tất cả các trường cần thiết
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -33,6 +34,16 @@ class ProjectPartSerializer(serializers.ModelSerializer):
             'subtasks'
         )
         return TaskDetailSerializer(tasks, many=True).data
+    
+    def get_archived_tasks(self, obj):
+        archived_tasks = obj.tasks.filter(
+            is_deleted=True,  # Lọc task đã xóa
+            parent_task__isnull=True
+        ).order_by('-created_at').prefetch_related(
+            'task_assignments__employee',
+            'subtasks'
+        )
+        return TaskDetailSerializer(archived_tasks, many=True).data
 
     def get_manager_id(self, obj):
         return obj.department.manager.id if obj.department and obj.department.manager else None

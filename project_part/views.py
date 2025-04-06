@@ -83,11 +83,12 @@ class ProjectPartViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    @action(detail=False, methods=['get'], url_path='archived/(?P<department_id>\d+)')
-    def get_archived_parts_by_department(self, request, department_id=None):
+    @action(detail=False, methods=['get'], url_path='with-archived-tasks/(?P<department_id>\d+)')
+    def with_archived_tasks(self, request, department_id=None):
         """
-        Lấy danh sách các phần dự án đã archive (is_deleted=True) theo department_id
-        URL: /api/project-parts/archived/<department_id>/
+        Lấy danh sách các phần dự án theo ID phòng ban (is_deleted=False)
+        nhưng chỉ lấy các task đã xóa (is_deleted=True) bên trong
+        URL: /api/project-parts/with-archived-tasks/<department_id>/
         """
         try:
             # Kiểm tra department có tồn tại không
@@ -98,19 +99,30 @@ class ProjectPartViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        archived_parts = ProjectPart.objects.filter(
-            is_deleted=True,
+        project_parts = self.queryset.filter(
             department_id=department_id
-        ).order_by('-created_at')
+        ).prefetch_related('tasks')
         
         # Phân trang
-        page = self.paginate_queryset(archived_parts)
+        page = self.paginate_queryset(project_parts)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            # Chỉ lấy archived_tasks, không lấy tasks thông thường
+            data = [{
+                **item,
+                'tasks': item['archived_tasks'],  # Thay tasks bằng archived_tasks
+                'archived_tasks': None  # Ẩn trường archived_tasks
+            } for item in serializer.data]
+            return self.get_paginated_response(data)
         
-        serializer = self.get_serializer(archived_parts, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(project_parts, many=True)
+        # Chỉ lấy archived_tasks, không lấy tasks thông thường
+        data = [{
+            **item,
+            'tasks': item['archived_tasks'],  # Thay tasks bằng archived_tasks
+            'archived_tasks': None  # Ẩn trường archived_tasks
+        } for item in serializer.data]
+        return Response(data, status=status.HTTP_200_OK)
 
 
     def get_serializer_context(self):
