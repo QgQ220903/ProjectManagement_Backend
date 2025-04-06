@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -36,7 +36,17 @@ class ProjectDetailViewSet(viewsets.ModelViewSet):
         instance.is_deleted = True
         instance.save()
         broadcast_project_update()
-        
+    
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        total_count = queryset.count()
+
+        return Response({
+            'count': total_count,
+            'results': serializer.data
+        }, status=status.HTTP_200_OK)
     @action(detail=True, methods=['get'])
     def details(self, request, pk=None):
         project = self.get_object()
