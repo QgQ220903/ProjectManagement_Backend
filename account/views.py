@@ -51,7 +51,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         try:
             user = Account.objects.get(email=email)
         except Account.DoesNotExist:
-            return Response({"error": "Email không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Tài khoản không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Kiểm tra mật khẩu
         if not user.check_password(password):
