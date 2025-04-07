@@ -46,12 +46,18 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-        user = authenticate(request, email=email, password=password)
 
-        if not user:
-            return Response({"error": "Sai email hoặc mật khẩu"}, status=status.HTTP_400_BAD_REQUEST)
-        if getattr(user, 'is_deleted', False):
-            return Response({"error": "Tài khoản không tồn tại hoặc đã bị xóa"}, status=status.HTTP_400_BAD_REQUEST)
+        # Kiểm tra tài khoản theo email
+        try:
+            user = Account.objects.get(email=email)
+        except Account.DoesNotExist:
+            return Response({"error": "Email không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Kiểm tra mật khẩu
+        if not user.check_password(password):
+            return Response({"error": "Mật khẩu không đúng"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Xác thực thành công
         refresh = RefreshToken.for_user(user)
         return Response({
             "refresh": str(refresh),

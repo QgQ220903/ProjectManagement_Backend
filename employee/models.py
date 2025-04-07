@@ -11,7 +11,7 @@ class Employee(models.Model):
     position = models.CharField(max_length=2, choices=POSITION_CHOICES)
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(blank=True, unique=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
