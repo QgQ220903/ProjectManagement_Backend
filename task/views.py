@@ -1,14 +1,21 @@
 from rest_framework import viewsets, filters, response
+
 from task_assignment.serializers import TaskAssignmentSerializer
 from task_assignment.models import TaskAssignment
 from .models import Task
-from .serializers import TaskSerializer  # Thêm dòng này
+
+from .serializers import TaskSerializer,TaskStatisticsFilterSerializer  # Thêm dòng này
 from .task_detail_serializers import TaskDetailSerializer
 from .employee_leaf_task_serializers import EmployeeLeafTaskSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination  # Thêm import
-
+from department.models import Department
+from project_part.models import ProjectPart
+from task.models import Task
+from django.utils.timezone import now
+from rest_framework.response import Response
+from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -114,3 +121,88 @@ class TaskViewSet(viewsets.ModelViewSet):  # Thêm class mới này để xử l
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
+
+
+
+
+class TaskStatisticsViewSet(viewsets.ViewSet):
+    serializer_class = TaskStatisticsFilterSerializer
+
+    @action(detail=False, methods=['post'], url_path='by-all-department')
+    def by_department(self, request):
+        serializer = TaskStatisticsFilterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated = serializer.validated_data
+        start_date = validated['start_date']
+        end_date = validated['end_date']
+        now_time = now()
+
+        results = []
+        departments = Department.objects.filter(is_deleted=False)
+        for dept in departments:
+            tasks = Task.objects.filter(
+                Q(start_time__range=(start_date, end_date)) |
+                Q(end_time__range=(start_date, end_date)),
+                project_part__department=dept,
+                is_deleted=False
+            )
+
+            done = tasks.filter(completion_percentage=100).count()
+            delayed = tasks.filter(
+                completion_percentage__lt=100,
+                end_time__lt=now_time
+            ).count()
+
+            results.append({
+                "department_id": dept.id,
+                "department_name": dept.name,
+                "total_tasks": tasks.count(),
+                "done": done,
+                "delayed": delayed,
+                "in_process": tasks.count()-done-delayed,
+            })
+
+        return Response(results)
+
+    @action(detail=False, methods=['post'], url_path='by-all-project-part')
+    def by_project_part(self, request):
+        serializer = TaskStatisticsFilterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated = serializer.validated_data
+        start_date = validated['start_date']
+        end_date = validated['end_date']
+        now_time = now()
+
+        results = []
+        project_parts = ProjectPart.objects.filter(is_deleted=False)
+        for part in project_parts:
+            tasks = Task.objects.filter(
+                Q(start_time__range=(start_date, end_date)) |
+                Q(end_time__range=(start_date, end_date)),
+                project_part=part,
+                is_deleted=False
+            )
+
+            done = tasks.filter( completion_percentage=100).count()
+            delayed = tasks.filter(
+                completion_percentage__lt=100,
+                end_time__lt=now_time
+            ).count()
+
+            results.append({
+                "project_part_id": part.id,
+                "project_part_name": part.name,
+                "department_id": part.department.id if part.department else None,
+                "department_name": part.department.name if part.department else None,
+                "total_tasks": tasks.count(),
+                "done": done,
+                "delayed": delayed,
+                "in_process": tasks.count() - done - delayed,
+            })
+
+        return Response(results)

@@ -17,3 +17,7 @@ class TaskSerializer(serializers.ModelSerializer):
             instance.update_completion()
             
         return instance
+
+class TaskStatisticsFilterSerializer(serializers.Serializer):
+    start_date = serializers.DateTimeField(required=True)
+    end_date = serializers.DateTimeField(required=True)
