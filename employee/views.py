@@ -57,7 +57,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='get_by_department/(?P<department_id>[^/.]+)')
     def get_by_department(self, request, department_id=None):
         """Lấy danh sách nhân viên theo ID phòng ban từ đường dẫn"""
-        employees = Employee.objects.filter(department_id=department_id)
+        employees = Employee.objects.filter(department_id=department_id, is_deleted=False)
         serializer = self.get_serializer(employees, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 # class EmployeeRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
