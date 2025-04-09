@@ -6,10 +6,20 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = '__all__'
     def validate_email(self, value):
-        if value and Employee.objects.filter(email=value, is_deleted=False).exists():
-            raise serializers.ValidationError("Email đã có người sử dụng")
+        if value:
+            qs = Employee.objects.filter(email=value, is_deleted=False)
+            # Nếu đang cập nhật, loại trừ chính instance hiện tại
+            if self.instance:
+                qs = qs.exclude(id=self.instance.id)
+            if qs.exists():
+                raise serializers.ValidationError("Email đã có người sử dụng")
         return value
+
     def validate_phone_number(self, value):
-        if value and Employee.objects.filter(phone_number=value, is_deleted=False).exists():
-            raise serializers.ValidationError("Số điện thoại đã có người sử dụng")
+        if value:
+            qs = Employee.objects.filter(phone_number=value, is_deleted=False)
+            if self.instance:
+                qs = qs.exclude(id=self.instance.id)
+            if qs.exists():
+                raise serializers.ValidationError("Số điện thoại đã có người sử dụng")
         return value
