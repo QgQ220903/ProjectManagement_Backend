@@ -247,7 +247,7 @@ class TaskReportViewSet(viewsets.ViewSet):
                     t.name,
                     t.parent_task_id,
                     tt.level + 1,
-                    CONCAT(tt.path, ' > ', t.name),
+                    CONCAT(tt.path, ' -> ', t.name),
                     t.completion_percentage,
                     t.created_at,
                     pp.name AS project_part_name
@@ -258,7 +258,7 @@ class TaskReportViewSet(viewsets.ViewSet):
 
             SELECT 
                 tt.id,
-                CONCAT(REPEAT('— ', tt.level), tt.name) AS task_display_name,
+                CONCAT(REPEAT('', tt.level), tt.name) AS task_display_name,
                 tt.level,
                 tt.path, 
                 tt.created_at,
