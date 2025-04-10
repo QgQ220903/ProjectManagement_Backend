@@ -223,53 +223,60 @@ class TaskReportViewSet(viewsets.ViewSet):
 
         with connection.cursor() as cursor:
             query = """
-                WITH RECURSIVE task_tree AS (
-   
-                SELECT 
-                    t.id,
-                    t.name,
-                    t.parent_task_id,
-                    0 AS level,
-                    CAST(t.name AS CHAR(1000)) AS path,
-                    t.completion_percentage,
-                    t.created_at,
-                    pp.name AS project_part_name
-                FROM tasks t
-                LEFT JOIN project_parts pp ON t.project_part_id = pp.id
-                WHERE t.parent_task_id IS NULL
-                AND t.created_at BETWEEN %s AND %s
+              WITH RECURSIVE task_tree AS (
+    SELECT 
+        t.id,
+        t.name,
+        t.parent_task_id,
+        0 AS level,
+        CAST(t.name AS CHAR(1000)) AS path,
+        t.completion_percentage,
+        t.created_at,
+        pp.name AS project_part_name,
+        dp.name AS department  
+    FROM tasks t
+    LEFT JOIN project_parts pp ON t.project_part_id = pp.id
+    LEFT JOIN departments dp ON pp.department_id = dp.id  
+    WHERE t.parent_task_id IS NULL
+      AND t.created_at BETWEEN %s AND %s 
 
-                UNION ALL
+    UNION ALL
 
-            
-                SELECT 
-                    t.id,
-                    t.name,
-                    t.parent_task_id,
-                    tt.level + 1,
-                    CONCAT(tt.path, ' > ', t.name),
-                    t.completion_percentage,
-                    t.created_at,
-                    pp.name AS project_part_name
-                FROM tasks t
-                LEFT JOIN project_parts pp ON t.project_part_id = pp.id
-                JOIN task_tree tt ON t.parent_task_id = tt.id
-            )
+    SELECT 
+        t.id,
+        t.name,
+        t.parent_task_id,
+        tt.level + 1,
+        CONCAT(tt.path, ' -> ', t.name),
+        t.completion_percentage,
+        t.created_at,
+        pp.name AS project_part_name,
+        dp.name AS department
+    FROM tasks t
+    LEFT JOIN project_parts pp ON t.project_part_id = pp.id
+    LEFT JOIN departments dp ON dp.id = pp.department_id
+    JOIN task_tree tt ON t.parent_task_id = tt.id
+)
 
-            SELECT 
-                tt.id,
-                CONCAT(REPEAT('— ', tt.level), tt.name) AS task_display_name,
-                tt.level,
-                tt.path, 
-                tt.created_at,
-                tt.completion_percentage,
-                tt.project_part_name,
-                GROUP_CONCAT(DISTINCT e.name SEPARATOR ', ') AS employee_names
-            FROM task_tree tt
-            LEFT JOIN task_assignments ta ON tt.id = ta.task_id
-            LEFT JOIN employees e ON ta.employee_id = e.id
-            GROUP BY tt.id, tt.name, tt.level, tt.path, tt.created_at, tt.completion_percentage, tt.project_part_name
-            ORDER BY tt.path;
+
+SELECT 
+    tt.id,
+    CONCAT(REPEAT('+   ', tt.level), tt.name) AS task_display_name,
+    tt.level,
+    tt.path, 
+    tt.created_at,
+    tt.completion_percentage,
+    tt.project_part_name,
+    tt.department,
+    GROUP_CONCAT(DISTINCT e.name SEPARATOR ', ') AS employee_names
+FROM task_tree tt
+LEFT JOIN task_assignments ta ON tt.id = ta.task_id
+LEFT JOIN employees e ON ta.employee_id = e.id
+GROUP BY 
+    tt.id, tt.name, tt.level, tt.path, tt.created_at, 
+    tt.completion_percentage, tt.project_part_name, tt.department
+ORDER BY tt.path;
+
             """
             cursor.execute(query, [start_date, end_date])
             columns = [col[0] for col in cursor.description]
