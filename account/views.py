@@ -8,7 +8,19 @@ from .models import Account
 from .serializers import AccountSerializer,LoginSerializer,LogoutSerializer,UpdateSerializer
 
 from rest_framework.pagination import PageNumberPagination
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 
+def send_account_update(message):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "account_updates",
+        {
+            "type": "send_account_update",
+            "message": message
+        }
+    )
 class AccountPagination(PageNumberPagination):
     page_size = 5
 class AccountViewSet(viewsets.ModelViewSet):
@@ -88,6 +100,10 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
+            send_account_update({
+                "action": "update",
+                "account": AccountSerializer(account).data
+            })
             return Response({"message": "Cập nhật thành công", "user": AccountSerializer(account).data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
