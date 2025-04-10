@@ -5,10 +5,13 @@ from employee.models import Employee  # Import model Employee từ ứng dụng 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     manager = EmployeeSerializer(read_only=True)  # Sử dụng EmployeeSerializer để hiển thị thông tin chi tiết của manager. read_only=True để chỉ đọc.
-
+    employee_count = serializers.SerializerMethodField()  # 👈 Thêm dòng này
     class Meta:
         model = Department  # Liên kết serializer với model Department
         fields = '__all__'  # Sử dụng tất cả các trường của model Department
+
+    def get_employee_count(self, obj):
+        return obj.employees.filter(is_deleted=False).count()  # 👈 hoặc điều kiện phù hợp với model
 
     def create(self, validated_data):
         manager_id = validated_data.pop('manager', None)  # Lấy manager_id từ validated_data và loại bỏ nó
